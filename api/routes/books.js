@@ -16,6 +16,23 @@ booksRouter.get("/", async (c) => {
   // Database logic
   const dbLogic = async (c) => {
     const sql = c.env.SQL;
+    
+    let testQuery = sql`SELECT column_id as id, column_title, first_img_file_name, publish_date FROM public.columns_meta_data;`
+    let testResults = await testQuery;
+    let cleanTestResults = testResults.map((res) => ({
+      ...res, 
+      author: "Frank Walsh", 
+      image_url: `/images/page-images/${res.first_img_file_name}`,
+      publish_date_display: res.publish_date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }),
+    }))
+    console.log("Test results");
+    console.log(JSON.stringify(cleanTestResults));
+
+    
     let query = sql`SELECT * FROM public.books`;
 
     // Apply genre filter if provided
@@ -54,10 +71,11 @@ booksRouter.get("/", async (c) => {
 
     // Execute query
     const results = await query;
+    console.log(JSON.stringify(results[0]))
 
     // Return results
     return Response.json({
-      books: results,
+      books: cleanTestResults,
       source: "database",
     });
   };
