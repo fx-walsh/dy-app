@@ -12,7 +12,7 @@ function Sidebar({ genres, activeGenre, counts }) {
             activeGenre === null ? "sidebar-link-active" : "sidebar-link"
           }
         >
-          All Books
+          All Columns
         </Link>
 
         <div className="sidebar-section">

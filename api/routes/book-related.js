@@ -6,53 +6,41 @@ const bookRelatedRouter = new Hono();
 
 // Related books endpoint
 bookRelatedRouter.get("/", async (c) => {
-  const bookId = c.req.param("id");
+  const columnId = c.req.param("id");
 
   // Use the imported mock logic
   const mockLogic = async (c) => {
-    return bookRelatedMockUtils.getRelatedBookData(c, bookId);
+    return bookRelatedMockUtils.getRelatedBookData(c, columnId);
   };
 
   // Database logic
   const dbLogic = async (c) => {
     const sql = c.env.SQL;
 
-    const book = await sql`SELECT * FROM public.books WHERE id = ${bookId}`;
+    // const book = await sql`SELECT * FROM public.books WHERE id = ${bookId}`;
 
-    if (book.length === 0) {
-      return Response.json({ error: "Book not found" }, { status: 404 });
+    let columns = await sql`
+      select 
+        column_id as id, 
+        column_title, 
+        first_img_file_name, 
+        publish_date 
+      from public.columns_meta_data 
+      where 
+        column_id = ${columnId}
+        `;
+
+    if (columns.length === 0) {
+      return Response.json({ error: "Column not found" }, { status: 404 });
     }
+    let column = columns[0];
 
-    let relatedBooks = [];
-    let recentBooks = [];
-    let genreCounts = [];
-
-    const bookGenre = book[0].genre;
-
-    relatedBooks = await sql`
-      SELECT * FROM public.books 
-      WHERE genre = ${bookGenre} AND id != ${bookId}
-      LIMIT 3`;
-
-    genreCounts = await sql`
-      SELECT genre, COUNT(*) as count 
-      FROM public.books 
-      GROUP BY genre 
-      ORDER BY count DESC`;
-
-    recentBooks = await sql`
-      SELECT * FROM public.books 
-      WHERE id != ${bookId} 
-      ORDER BY created_at DESC 
-      LIMIT 2`;
 
     return Response.json({
-      bookId: bookId,
-      bookGenre: bookGenre,
-      relatedBooks,
-      recentRecommendations: recentBooks,
-      genreStats: genreCounts,
-      source: "database",
+      columnId: column.id,
+      columnTitle: column.column_title,
+      first_img_file_name: column.first_img_file_name,
+      publishDate: column.publish_date,
     });
   };
 

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import postgres from "postgres";
-import booksRouter from "./routes/books";
+import booksRouter from "./routes/columns";
 import bookRelatedRouter from "./routes/book-related";
 import { mockBooks } from "./lib/mockData";
 
@@ -40,8 +40,8 @@ app.use("*", async (c, next) => {
   }
 });
 
-app.route("/api/books", booksRouter);
-app.route("/api/books/:id/related", bookRelatedRouter);
+app.route("/api/columns", booksRouter);
+app.route("/api/columns/:id/related", bookRelatedRouter);
 
 // Catch-all route for static assets
 app.all("*", async (c) => {

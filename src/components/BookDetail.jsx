@@ -1,17 +1,21 @@
 import { useNavigate } from "react-router";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { useState } from "react";
 import Breadcrumbs from "./Breadcrumbs";
 
 function BookDetail({ bookData }) {
   const navigate = useNavigate();
-  const { book, relatedBooks } = bookData;
+  const { column } = bookData;
 
-  const breadcrumbItems = [{ label: "All Books", value: null }];
+  // Handle multiple images
+  const images = column.image_urls && column.image_urls.length > 0 
+    ? column.image_urls
+    : [column.image_url]; // fallback to single image
 
-  if (book.genre) {
-    breadcrumbItems.push({ label: book.genre, value: book.genre });
-  }
+  const [currentPage, setCurrentPage] = useState(0);
 
-  breadcrumbItems.push({ label: book.title, value: "book" });
+  const breadcrumbItems = [{ label: "All Columns", value: null }];
+  breadcrumbItems.push({ label: column.column_title, value: "column" });
 
   const handleNavigate = (value) => {
     if (value === null) {
@@ -21,83 +25,84 @@ function BookDetail({ bookData }) {
     }
   };
 
-  const handleRelatedBookClick = (bookId) => {
-    navigate(`/book/${bookId}`);
+  const handleNextPage = () => {
+    setCurrentPage((prev) => (prev + 1) % images.length);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => (prev - 1 + images.length) % images.length);
   };
 
   return (
     <div>
       <Breadcrumbs items={breadcrumbItems} onNavigate={handleNavigate} />
 
-      <div className="space-y-12 mt-6">
-        <div className="card">
-          <div className="md:flex gap-10">
-            <div className="md:w-1/3 lg:w-1/4 flex-shrink-0 mb-8 md:mb-0">
-              <img
-                src={book.image_url}
-                alt={book.title}
-                className="w-full h-full object-contain rounded-md border border-gray-200"
-              />
+      <div className="space-y-6 mt-6">
+        <div className="card p-6">
+          {/* Title & Author */}
+          <h1 className="mb-3 text-2xl font-bold">{column.column_title}</h1>
+          <h2 className="text-lg text-gray-700 mb-6 font-serif">
+            by {column.author}
+          </h2>
+
+          {/* Genre */}
+          {column.genre && (
+            <div className="mb-6">
+              <span
+                className="inline-block border border-blue-800 text-blue-800 text-sm px-3 py-1 rounded-full font-sans cursor-pointer"
+                onClick={() =>
+                  navigate(`/genre/${encodeURIComponent(column.genre)}`)
+                }
+              >
+                {column.genre}
+              </span>
             </div>
-            <div className="md:w-2/3 lg:w-3/4">
-              <h1 className="mb-3">{book.title}</h1>
-              <h2 className="text-xl text-gray-900 mb-6 font-serif font-normal">
-                by {book.author}
-              </h2>
+          )}
 
-              {book.genre && (
-                <div className="mb-6">
-                  <span
-                    className="inline-block border border-blue-800 text-blue-800 text-sm px-3 py-1 rounded-full font-sans cursor-pointer"
-                    onClick={() =>
-                      navigate(`/genre/${encodeURIComponent(book.genre)}`)
-                    }
-                  >
-                    {book.genre}
-                  </span>
-                </div>
-              )}
+          {/* Image Viewer with navigation */}
+          <div className="relative w-full h-[80vh] border rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
+            <TransformWrapper>
+              <TransformComponent>
+                <img
+                  src={images[currentPage]}
+                  alt={`${column.column_title} - Page ${currentPage + 1}`}
+                  className="max-h-[80vh] object-contain"
+                />
+              </TransformComponent>
+            </TransformWrapper>
 
-              <p className="text-gray-900 leading-relaxed">
-                {book.description}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Other books in this genre - combined section */}
-        {relatedBooks.length > 0 && (
-          <section className="mb-12">
-            <h3 className="mb-6">
-              {book.genre
-                ? `Other Books in ${book.genre}`
-                : "You May Also Like"}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-              {relatedBooks.map((relBook) => (
-                <div
-                  key={relBook.id}
-                  className="card py-4 px-5 text-center cursor-pointer"
-                  onClick={() => handleRelatedBookClick(relBook.id)}
+            {/* Prev Button */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={handlePrevPage}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full p-3 hover:bg-gray-100"
                 >
-                  <div className="w-24 h-32 mx-auto mb-3">
-                    <img
-                      src={relBook.image_url}
-                      alt={relBook.title}
-                      className="w-full h-full object-contain rounded-sm border border-gray-200"
-                    />
-                  </div>
-                  <div className="font-serif text-gray-900 mb-1 line-clamp-1">
-                    {relBook.title}
-                  </div>
-                  <div className="text-gray-900 text-sm font-sans">
-                    {relBook.author}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+                  ◀
+                </button>
+                {/* Next Button */}
+                <button
+                  onClick={handleNextPage}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full p-3 hover:bg-gray-100"
+                >
+                  ▶
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Page indicator */}
+          {images.length > 1 && (
+            <p className="mt-4 text-center text-sm text-gray-600">
+              Page {currentPage + 1} of {images.length}
+            </p>
+          )}
+
+          {/* Description */}
+          <p className="text-gray-900 leading-relaxed mt-6">
+            {column.description}
+          </p>
+        </div>
       </div>
     </div>
   );

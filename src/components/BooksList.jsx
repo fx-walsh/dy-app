@@ -13,7 +13,7 @@ function useBooks(filter, sortBy) {
         if (filter) params.append("genre", filter);
         if (sortBy) params.append("sort", sortBy);
 
-        const url = `/api/books${params.toString() ? `?${params.toString()}` : ""}`;
+        const url = `/api/columns${params.toString() ? `?${params.toString()}` : ""}`;
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -72,8 +72,8 @@ function BooksList({ filter, onSelectBook }) {
           <option value="">Sort by...</option>
           <option value="title_asc">Title (A-Z)</option>
           <option value="title_desc">Title (Z-A)</option>
-          <option value="author_asc">Author (A-Z)</option>
-          <option value="author_desc">Author (Z-A)</option>
+          <option value="publish_date_asc">Publish Date (earliest first)</option>
+          <option value="publish_date_desc">Publish Date (latest first)</option>
         </select>
       </div>
 

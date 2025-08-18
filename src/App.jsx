@@ -24,7 +24,7 @@ function App() {
   useEffect(() => {
     const loadGenres = async () => {
       try {
-        const response = await fetch("/api/books");
+        const response = await fetch("/api/columns");
         if (!response.ok) {
           throw new Error(`API returned status: ${response.status}`);
         }
@@ -60,29 +60,17 @@ function App() {
       setLoading(true);
       try {
         // First get basic book details
-        const bookResponse = await fetch(`/api/books/${bookId}`);
+        const columnResponse = await fetch(`/api/columns/${bookId}`);
 
-        if (!bookResponse.ok) {
-          throw new Error(`API returned status: ${bookResponse.status}`);
+        if (!columnResponse.ok) {
+          throw new Error(`API returned status: ${columnResponse.status}`);
         }
 
-        const bookData = await bookResponse.json();
-
-        // Then get related books data
-        const relatedResponse = await fetch(`/api/books/${bookId}/related`);
-
-        if (!relatedResponse.ok) {
-          throw new Error(`API returned status: ${relatedResponse.status}`);
-        }
-
-        const relatedData = await relatedResponse.json();
+        const columnData = await columnResponse.json();
 
         // Combine the data
         const combinedData = {
-          book: bookData.book,
-          relatedBooks: relatedData.relatedBooks,
-          recentRecommendations: relatedData.recentRecommendations,
-          genreStats: relatedData.genreStats,
+          column: columnData,
         };
 
         setBookDetail(combinedData);
@@ -97,7 +85,7 @@ function App() {
   }, [bookId]);
 
   const handleSelectBook = (bookId) => {
-    navigate(`/book/${bookId}`);
+    navigate(`/column/${bookId}`);
   };
 
   const handleSelectGenre = (genre) => {
@@ -122,7 +110,7 @@ function App() {
         {!bookId && (
           <Breadcrumbs
             items={[
-              { label: "All Books", value: null },
+              { label: "All Columns", value: null },
               ...(activeGenre
                 ? [{ label: activeGenre, value: activeGenre }]
                 : []),
@@ -136,13 +124,7 @@ function App() {
         )}
 
         <div className="page-header">
-          <h1>{activeGenre ? `${activeGenre} Books` : "My Library"}</h1>
-          <p className="text-gray-900">
-            {activeGenre
-              ? `Explore our collection of ${activeGenre.toLowerCase()} books`
-              : "Discover your next favorite book"}
-          </p>
-
+          <h1>{activeGenre ? `${activeGenre} Books` : "Damn Yankee Columns"}</h1>
           {/* Show banner only when using mock data */}
           {dataSource === "mock" && <MockDataBanner />}
         </div>
