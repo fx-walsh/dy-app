@@ -4,4 +4,13 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 
 export default defineConfig({
   plugins: [react(), cloudflare()],
+  server: {
+    port: 5173,
+    proxy: {
+      "/api": {
+        target: "http://localhost:8787", // Miniflare Worker port
+        changeOrigin: true,
+      },
+    },
+  },
 });

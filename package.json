@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@tailwindcss/postcss": "4.1.4",
+    "miniflare": "^4.20250813.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-router": "7.6.3",
