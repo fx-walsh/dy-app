@@ -1,9 +1,15 @@
 function BookCard({ book, onClick }) {
+  // Determine the source to use
+  // We prioritize the Base64 data URL if it exists, otherwise fall back to the old URL.
+  const imageSource = book.image_data_base64 
+    ? book.image_data_base64 
+    : book.image_url;
+  
   return (
     <div className="book-card cursor-pointer" onClick={onClick}>
       <div className="book-card-image">
         <img
-          src={book.image_url}
+          src={imageSource}
           alt={book.column_title}
           className="w-full h-full object-contain transition-transform hover:scale-[1.03] duration-300"
         />

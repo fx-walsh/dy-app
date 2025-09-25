@@ -1,11 +1,22 @@
 import { Hono } from "hono";
 import { selectDataSource, booksMockUtils } from "../lib/utils.js";
 
+function arrayBufferToBase64(buffer) {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+}
+
 // Create books router
 const booksRouter = new Hono();
 
 // Books list endpoint with filtering and sorting
 booksRouter.get("/", async (c) => {
+  console.log("hitting columns endpoints")
   const { genre, sort } = c.req.query();
 
   // Use imported mock logic
@@ -55,19 +66,64 @@ booksRouter.get("/", async (c) => {
         `;
 
     // Then execute the query (you'll need to await the promise)
-    const result = await query; // Example: assuming you're within an async function
-
     let res = await query;
-    let cleanRes = res.map((res) => ({
-      ...res, 
-      author: "Frank Walsh", 
-      image_url: `/images/page-images/${res.first_img_file_name}`,
-      publish_date_display: res.publish_date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }),
-    }))
+    
+    let cleanRes = await Promise.all(res.map(async (item) => {
+      const filename = item.first_img_file_name;
+      console.log(`Getting R2 file: ${filename}`);
+
+      // Fetch the R2 object
+      const r2_obj = await c.env.PAGE_IMAGES_BUCKET.get(filename);
+
+      // Check if the object exists
+      if (!r2_obj) {
+          return {
+              ...item,
+              author: "Frank Walsh",
+              image_url: `/images/page-images/${filename}`,
+              publish_date_display: item.publish_date.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+              }),
+              // Use a placeholder or null if the file isn't found
+              image_data_base64: null, 
+          };
+      }
+
+      console.log(`file was found ${filename}`)
+      // Convert the R2 object body (a ReadableStream) into a Base64 string
+      const arrayBuffer = await r2_obj.arrayBuffer();
+      
+      // Note: The below conversion requires a runtime that supports Buffer or TextEncoder/Decoder, 
+      // which Workers/Cloudflare often provide globally or via specific APIs.
+      // In a Cloudflare Worker, you can often use the global Buffer or dedicated APIs.
+      // We'll use the standard Web API way with the global `btoa` if the bytes are small, 
+      // or TextEncoder/Decoder for more robust binary-to-string conversion. 
+      
+      // For a robust solution in Cloudflare Workers, you might need a helper function 
+      // to handle ArrayBuffer to Base64 conversion, as the global `btoa` is for strings.
+      // The most reliable way is often to use a library or a well-tested function.
+
+      // A common helper function for Workers:
+      const base64String = arrayBufferToBase64(arrayBuffer);
+
+      return {
+          ...item, 
+          author: "Frank Walsh", 
+          // This is a relative path to the image, useful if you're serving the image separately
+          image_url: `/images/page-images/${filename}`, 
+          publish_date_display: item.publish_date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+          }),
+          // Send the actual image data as a Data URL (Base64 encoded string)
+          image_data_base64: `data:image/png;base64,${base64String}`,
+          // Optionally include metadata
+          image_contentType: r2_obj.httpMetadata?.contentType || 'image/png'
+      };
+  }));
 
     // Return results
     return Response.json({

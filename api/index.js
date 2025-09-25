@@ -7,6 +7,12 @@ const app = new Hono();
 
 // Setup SQL client middleware
 app.use("*", async (c, next) => {
+  
+  if (c.env.PAGE_IMAGES_BUCKET) {
+    console.log("pages r2 binding exists");
+    console.log(c.env.PAGE_IMAGES_BUCKET)
+  }
+  
   // Check if Hyperdrive binding is available
   if (c.env.HYPERDRIVE) {
     try {
