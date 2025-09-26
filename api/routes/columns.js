@@ -144,7 +144,6 @@ columnsRouter.get("/:id", async (c) => {
       .all();            // 3. Execute and get all results
 
   // The columns variable now holds the array of results
-
     if (columns.length === 0) {
       return Response.json({ error: "Column not found" }, { status: 404 });
     }
