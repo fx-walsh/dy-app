@@ -1,5 +1,5 @@
 // Mock data for when database connection is unavailable
-export const mockBooks = [
+export const mockColumns = [
   {
     id: 1,
     title: "The Brothers Karamazov",

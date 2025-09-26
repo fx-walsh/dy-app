@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import BookCard from "./BookCard";
+import ColumnCard from "./ColumnCard";
 
-function useBooks(filter, sortBy) {
-  const [books, setBooks] = useState([]);
+function useColumns(filter, sortBy) {
+  const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBooks = async () => {
+    const fetchColumns = async () => {
       try {
         const params = new URLSearchParams();
         if (filter) params.append("genre", filter);
@@ -22,32 +22,32 @@ function useBooks(filter, sortBy) {
 
         const data = await response.json();
 
-        if (!data.books?.length) {
-          console.error("No books data found:", data);
-          setBooks([]);
+        if (!data.columns?.length) {
+          console.error("No columns data found:", data);
+          setColumns([]);
         } else {
-          setBooks(data.books);
+          setColumns(data.columns);
         }
       } catch (error) {
-        console.error("Error loading books:", error);
+        console.error("Error loading columns:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBooks();
+    fetchColumns();
   }, [filter, sortBy]);
 
-  return { books, loading };
+  return { columns, loading };
 }
 
-function BooksList({ filter, onSelectBook }) {
+function ColumnsList({ filter, onSelectColumn }) {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState("");
-  const { books, loading } = useBooks(filter, sortBy);
+  const { columns, loading } = useColumns(filter, sortBy);
 
-  const handleBookSelect = (bookId) => {
-    onSelectBook ? onSelectBook(bookId) : navigate(`/book/${bookId}`);
+  const handleColumnSelect = (bookId) => {
+    onSelectColumn ? onSelectColumn(bookId) : navigate(`/column/${bookId}`);
   };
   const handleSortChange = (e) => {
     setSortBy(e.target.value);
@@ -78,11 +78,11 @@ function BooksList({ filter, onSelectBook }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {books.map((book) => (
-          <BookCard
+        {columns.map((book) => (
+          <ColumnCard
             key={book.id}
             book={book}
-            onClick={() => handleBookSelect(book.id)}
+            onClick={() => handleColumnSelect(book.id)}
           />
         ))}
       </div>
@@ -90,4 +90,4 @@ function BooksList({ filter, onSelectBook }) {
   );
 }
 
-export default BooksList;
+export default ColumnsList;

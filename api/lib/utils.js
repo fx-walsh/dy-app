@@ -30,26 +30,26 @@ export const bookRelatedMockUtils = {
   /**
    * Generates mock related books response
    * @param {object} c - Hono context
-   * @param {string} bookId - Book ID to fetch related data for
+   * @param {string} bookId - Column ID to fetch related data for
    * @returns {Response} Mock API response
    */
-  getRelatedBookData: async (c, bookId) => {
+  getRelatedColumnData: async (c, bookId) => {
     const bookIdNum = parseInt(bookId, 10);
     const book = c.env.MOCK_DATA.find((book) => book.id === bookIdNum);
 
     if (!book) {
-      return Response.json({ error: "Book not found" }, { status: 404 });
+      return Response.json({ error: "Column not found" }, { status: 404 });
     }
 
     const bookGenre = book.genre;
 
     // Generate mock related data
-    const relatedBooks = c.env.MOCK_DATA.filter(
+    const relatedColumns = c.env.MOCK_DATA.filter(
       (b) => b.genre === bookGenre && b.id !== bookIdNum,
     ).slice(0, 3);
 
     // Generate mock recent books
-    const recentBooks = c.env.MOCK_DATA.filter((b) => b.id !== bookIdNum).slice(
+    const recentColumns = c.env.MOCK_DATA.filter((b) => b.id !== bookIdNum).slice(
       0,
       2,
     );
@@ -70,8 +70,8 @@ export const bookRelatedMockUtils = {
     return Response.json({
       bookId: bookId,
       bookGenre: bookGenre,
-      relatedBooks,
-      recentRecommendations: recentBooks,
+      relatedColumns,
+      recentRecommendations: recentColumns,
       genreStats: genreCounts,
       source: "mock",
     });
@@ -81,7 +81,7 @@ export const bookRelatedMockUtils = {
 /**
  * Contains mock data logic functions for books endpoints
  */
-export const booksMockUtils = {
+export const columnsMockUtils = {
   /**
    * Generates mock books list with optional filtering and sorting
    * @param {object} c - Hono context
@@ -89,7 +89,7 @@ export const booksMockUtils = {
    * @param {string} sort - Optional sort parameter
    * @returns {Response} Mock API response
    */
-  getBooksList: async (c, genre, sort) => {
+  getColumnsList: async (c, genre, sort) => {
     let results = [...c.env.MOCK_DATA];
 
     // Apply genre filter if provided
@@ -127,15 +127,15 @@ export const booksMockUtils = {
   /**
    * Generates mock book detail response
    * @param {object} c - Hono context
-   * @param {string} bookId - Book ID to fetch
+   * @param {string} bookId - Column ID to fetch
    * @returns {Response} Mock API response
    */
-  getBookDetail: async (c, bookId) => {
+  getColumnDetail: async (c, bookId) => {
     const bookIdNum = parseInt(bookId, 10);
     const book = c.env.MOCK_DATA.find((book) => book.id === bookIdNum);
 
     if (!book) {
-      return Response.json({ error: "Book not found" }, { status: 404 });
+      return Response.json({ error: "Column not found" }, { status: 404 });
     }
 
     return Response.json({

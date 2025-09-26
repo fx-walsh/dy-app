@@ -3,14 +3,14 @@ import { useNavigate, useParams } from "react-router";
 import { groupByGenre } from "./lib/utils";
 import Breadcrumbs from "./components/Breadcrumbs";
 import Sidebar from "./components/Sidebar";
-import BooksList from "./components/BooksList";
-import BookDetail from "./components/BookDetail";
+import ColumnsList from "./components/ColumnsList";
+import ColumnDetail from "./components/ColumnDetail";
 import MockDataBanner from "./components/MockDataBanner";
 
 function App() {
   const navigate = useNavigate();
   const params = useParams();
-  const [bookDetail, setBookDetail] = useState(null);
+  const [bookDetail, setColumnDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [genres, setGenres] = useState([]);
   const [dataSource, setDataSource] = useState(null);
@@ -29,13 +29,15 @@ function App() {
           throw new Error(`API returned status: ${response.status}`);
         }
         const data = await response.json();
+        console.log("got response");
+        console.log(JSON.stringify(data));
 
-        if (!data.books?.length) {
-          console.error("No books data found:", typeof data);
+        if (!data.columns?.length) {
+          console.error("No columns data found:", typeof data);
           return;
         }
 
-        const booksArray = data.books;
+        const booksArray = data.columns;
 
         // Check if using mock data or database
         if (data.source) {
@@ -56,10 +58,11 @@ function App() {
   useEffect(() => {
     if (!bookId) return;
 
-    const fetchBookDetail = async () => {
+    const fetchColumnDetail = async () => {
       setLoading(true);
       try {
         // First get basic book details
+        console.log("trying to hit specific column endpoints")
         const columnResponse = await fetch(`/api/columns/${bookId}`);
 
         if (!columnResponse.ok) {
@@ -73,7 +76,7 @@ function App() {
           column: columnData,
         };
 
-        setBookDetail(combinedData);
+        setColumnDetail(combinedData);
       } catch (error) {
         console.error("Error fetching book details:", error);
       } finally {
@@ -81,10 +84,11 @@ function App() {
       }
     };
 
-    fetchBookDetail();
+    fetchColumnDetail();
   }, [bookId]);
 
-  const handleSelectBook = (bookId) => {
+  const handleSelectColumn = (bookId) => {
+    console.log("trying to navigate to columns endpoint");
     navigate(`/column/${bookId}`);
   };
 
@@ -124,7 +128,7 @@ function App() {
         )}
 
         <div className="page-header">
-          <h1>{activeGenre ? `${activeGenre} Books` : "Damn Yankee Columns"}</h1>
+          <h1>{activeGenre ? `${activeGenre} Columns` : "Damn Yankee Columns"}</h1>
           {/* Show banner only when using mock data */}
           {dataSource === "mock" && <MockDataBanner />}
         </div>
@@ -135,14 +139,14 @@ function App() {
               <div className="h-10 w-10 border-2 border-blue-800 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : bookDetail ? (
-            <BookDetail bookData={bookDetail} />
+            <ColumnDetail bookData={bookDetail} />
           ) : (
             <div className="text-center py-20 text-gray-600">
               Error loading book details
             </div>
           )
         ) : (
-          <BooksList onSelectBook={handleSelectBook} filter={activeGenre} />
+          <ColumnsList onSelectColumn={handleSelectColumn} filter={activeGenre} />
         )}
       </main>
     </div>

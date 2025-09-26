@@ -3,7 +3,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { useState } from "react";
 import Breadcrumbs from "./Breadcrumbs";
 
-function BookDetail({ bookData }) {
+function ColumnDetail({ bookData }) {
   const navigate = useNavigate();
   const { column } = bookData;
 
@@ -108,4 +108,4 @@ function BookDetail({ bookData }) {
   );
 }
 
-export default BookDetail;
+export default ColumnDetail;
