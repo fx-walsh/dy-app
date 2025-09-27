@@ -76,6 +76,7 @@ columnsRouter.get("/", async (c) => {
       // ⚠️ IMPORTANT: Replace this placeholder with your actual R2 public URL base.
       // Example: https://pub-xxxxxxxxxxxxxxxx.r2.dev/ or your custom domain
       const R2_PUBLIC_URL_BASE = c.env.R2_PUBLIC_URL; // Assuming you set this env var
+        console.log(`trying url ${R2_PUBLIC_URL_BASE}!!! abc`)
         return {
             ...item, 
             author: "Frank Walsh", 

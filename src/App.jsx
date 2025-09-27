@@ -29,8 +29,6 @@ function App() {
           throw new Error(`API returned status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("got response");
-        console.log(JSON.stringify(data));
 
         if (!data.columns?.length) {
           console.error("No columns data found:", typeof data);
@@ -62,7 +60,6 @@ function App() {
       setLoading(true);
       try {
         // First get basic book details
-        console.log("trying to hit specific column endpoints")
         const columnResponse = await fetch(`/api/columns/${bookId}`);
 
         if (!columnResponse.ok) {
@@ -88,7 +85,6 @@ function App() {
   }, [bookId]);
 
   const handleSelectColumn = (bookId) => {
-    console.log("trying to navigate to columns endpoint");
     navigate(`/column/${bookId}`);
   };
 

@@ -16,26 +16,23 @@
     "assets": {
         "binding": "ASSETS",
         "not_found_handling": "single-page-application",
-        "directory": "./public"
+        "directory": "./dist"
     },
     "placement": {
         "mode": "smart"
     },
     "upload_source_maps": true,
-    
     // --- START D1 CONFIGURATION ---
     "d1_databases": [
         {
-            "binding": "D1_DATABASE",       // 👈 This is the variable name used in your Worker code (e.g., env.D1_DATABASE)
-            "database_name": "dy-app-db",   // 👈 The name of the database in the Cloudflare dashboard
+            "binding": "D1_DATABASE", // 👈 This is the variable name used in your Worker code (e.g., env.D1_DATABASE)
+            "database_name": "dy-app-db", // 👈 The name of the database in the Cloudflare dashboard
             "database_id": "f6b1b70f-feb2-48a5-8313-29856526f0b2" // 👈 Required for remote access
         }
     ],
     // --- END D1 CONFIGURATION ---
-
     // The 'hyperdrive' section has been removed:
     // "hyperdrive": [ ... ],
-
     "r2_buckets": [
         {
             "binding": "PAGE_IMAGES_BUCKET",
@@ -43,30 +40,30 @@
         }
     ],
     "vars": {
-            "R2_PUBLIC_URL": "http://127.0.0.1:8787/images" // need to update to real url when time comes
-        },
+        "R2_PUBLIC_URL": "https://pub-e02615f8571d48ceb23b736630c46e66.r2.dev" // need to update to real url when time comes
+    },
     "env": {
-    "development": {
-      // You can also create a development-specific D1 binding here if needed
-      // to point to a different local or remote database.
-      "d1_databases": [
-          {
-              "binding": "D1_DATABASE",
-              // When running locally with `wrangler dev`, this will automatically 
-              // create a local SQLite file in `.wrangler/state/v3/d1/`
-              "database_name": "dy-app-db-dev", 
-              "database_id": "YOUR_DEV_DATABASE_ID_HERE"
-          }
-      ],
-      "r2_buckets": [
-        {
-          "binding": "PAGE_IMAGES_BUCKET",
-          "bucket_name": "dy-page-images-dev"
-        }
-      ],
-      "vars": {
-            "R2_PUBLIC_URL": "http://127.0.0.1:8787/images" 
+        "development": {
+            // You can also create a development-specific D1 binding here if needed
+            // to point to a different local or remote database.
+            "d1_databases": [
+                {
+                    "binding": "D1_DATABASE",
+                    // When running locally with `wrangler dev`, this will automatically 
+                    // create a local SQLite file in `.wrangler/state/v3/d1/`
+                    "database_name": "dy-app-db-dev",
+                    "database_id": "YOUR_DEV_DATABASE_ID_HERE"
+                }
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "PAGE_IMAGES_BUCKET",
+                    "bucket_name": "dy-page-images-dev"
+                }
+            ],
+            "vars": {
+                "R2_PUBLIC_URL": "https://pub-e02615f8571d48ceb23b736630c46e66.r2.dev"
+            }
         }
     }
-  }
 }

@@ -54,8 +54,8 @@
     "build": "vite build",
     "cf-typegen": "wrangler types",
     "check": "vite build && wrangler deploy --dry-run",
-    "deploy": "wrangler deploy",
-    "dev": "vite",
+    "deploy": "vite build && wrangler deploy",
+    "dev": "wrangler dev",
     "lint": "eslint .",
     "preview": "vite preview"
   },
