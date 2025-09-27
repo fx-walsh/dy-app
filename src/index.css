@@ -77,7 +77,7 @@ p {
   @apply flex min-h-screen bg-gray-50;
 }
 
-.sidebar {
+/* .sidebar {
   @apply fixed top-0 left-0 h-full w-[280px] bg-white border-r border-gray-200 pt-10 pb-6 overflow-y-auto z-10;
 }
 
@@ -103,11 +103,83 @@ p {
 
 .sidebar-heading {
   @apply px-6 mb-2 text-xs font-medium text-gray-900 uppercase tracking-wider;
+} */
+
+.sidebar {
+  /* MODIFIED: Add transition properties */
+  @apply fixed top-0 left-0 h-full w-[var(--spacing-sidebar)] bg-white border-r border-gray-200 
+         pt-10 pb-6 overflow-y-auto z-10 transition-[width,padding] duration-300 ease-in-out;
+}
+
+/* NEW: Class for the closed state */
+.sidebar-closed {
+  @apply w-[var(--spacing-sidebar-collapsed)] px-0;
+}
+
+.sidebar-title {
+  /* MODIFIED: Use Tailwind's conditional group styles to hide in collapsed state */
+  @apply font-serif text-lg font-semibold px-6 mb-8 transition-opacity duration-150;
+}
+.sidebar-closed .sidebar-title {
+    @apply opacity-0 pointer-events-none;
+}
+
+.sidebar-nav {
+  /* MODIFIED: Ensure internal content is hidden/spaced correctly */
+  @apply space-y-1 px-3;
+}
+.sidebar-closed .sidebar-nav {
+    @apply space-y-0; /* Adjust space for visual appeal in collapsed state */
+}
+
+
+.sidebar-link, .sidebar-link-active {
+  /* MODIFIED: Adjust padding for consistency with the collapsed state */
+  @apply block px-3 py-2 text-gray-900 hover:bg-blue-50 rounded-lg transition-colors font-sans text-sm;
+}
+.sidebar-closed .sidebar-link, .sidebar-closed .sidebar-link-active {
+    /* Optional: Center link text/icons if you want a minimalist look */
+    @apply text-center;
+}
+
+.sidebar-section {
+  /* MODIFIED: Use Tailwind's conditional group styles to hide in collapsed state */
+  @apply pt-6 pb-2 transition-opacity duration-150;
+}
+.sidebar-closed .sidebar-section {
+    @apply opacity-0 pointer-events-none;
+}
+
+.sidebar-heading {
+  /* MODIFIED: Completely hide the section heading in collapsed state */
+  @apply px-6 mb-2 text-xs font-medium text-gray-900 uppercase tracking-wider;
+}
+.sidebar-closed .sidebar-heading {
+    @apply hidden;
 }
 
 .main-content {
-  @apply ml-[280px] flex-1 py-8 px-6 md:px-10 relative z-0;
+  /* MODIFIED: Use CSS transition on margin and dynamic variable for margin-left */
+  @apply ml-[var(--spacing-sidebar)] flex-1 py-8 px-6 md:px-10 relative z-0 transition-[margin] duration-300 ease-in-out;
 }
+
+/* .main-content {
+  @apply ml-[280px] flex-1 py-8 px-6 md:px-10 relative z-0;
+} */
+
+/* NEW: Class for the main content when the sidebar is closed */
+.main-content-shifted {
+    @apply ml-[var(--spacing-sidebar-collapsed)];
+}
+
+
+/* NEW: Sidebar Toggle Button (You will need to style this) */
+.sidebar-toggle-button {
+  /* Position the button just outside the sidebar, or inside near the top */
+  @apply absolute top-5 right-5 z-20 p-1 rounded-full bg-white border border-gray-300 shadow-md 
+         hover:bg-gray-100 transition-colors cursor-pointer text-gray-700;
+}
+
 
 .page-header {
   @apply mb-12;

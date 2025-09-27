@@ -5,29 +5,18 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 export default defineConfig({
   plugins: [react(), cloudflare()],
   server: {
-    // Explicitly set the host to ensure HMR connects
-    host: 'http://127.0.0.1', 
-    // You may also need to set a specific HMR port if the default is failing
+    // Use 0.0.0.0 to bind to all interfaces, not just localhost
+    host: '0.0.0.0',
+    port: 5173,
+    // HMR configuration
     hmr: {
-      port: 5174, // Try a different port if needed
-    }
+      port: 5173, // Use same port as dev server
+      host: 'localhost', // Ensure HMR connects to localhost
+    },
+    // Allow connections from any origin (helpful for local dev)
+    cors: true,
   },
   build: {
-    // 👈 ADD THIS: Specify the output directory for 'npm run build'
-    // This folder will contain index.html and all compiled assets.
-    outDir: "dist", 
+    outDir: "dist",
   },
-  
-  // 👈 REMOVE THIS ENTIRE SECTION
-  /*
-  server: {
-    port: 5173,
-    proxy: {
-      "/api": {
-        target: "http://localhost:8787", 
-        changeOrigin: true,
-      },
-    },
-  },
-  */
 });
