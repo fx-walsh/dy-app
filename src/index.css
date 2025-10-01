@@ -180,6 +180,76 @@ p {
          hover:bg-gray-100 transition-colors cursor-pointer text-gray-700;
 }
 
+/* ======================================================== */
+/* 🍔 MOBILE HAMBURGER NAVIGATION STYLES 📱 */
+/* Apply these styles ONLY on screens up to 768px (like the Tailwind 'md' breakpoint) */
+/* ======================================================== */
+
+@media (max-width: 768px) {
+  
+  /* 1. HIDE THE DESKTOP TOGGLE BUTTON */
+  .sidebar-toggle-button {
+      /* Revert to hidden on mobile to avoid conflict with the hamburger button */
+      display: none; 
+  }
+
+  /* 2. THE HAMBURGER/CLOSE BUTTON */
+  .hamburger-menu-button {
+      /* This is the new button class from the component update */
+      display: block;
+      position: fixed;
+      top: 1rem; /* 4 units in Tailwind */
+      left: 1rem; /* 4 units in Tailwind */
+      /* Use Tailwind classes for styling */
+      @apply z-[1001] text-2xl bg-white border border-gray-300 rounded-lg shadow-lg p-2 cursor-pointer;
+  }
+  
+  /* 3. SIDEBAR POSITIONING */
+  .sidebar {
+      /* Override desktop styles for mobile */
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh; /* Use viewport height for full screen coverage */
+      width: 75%; /* Takes up most of the screen width */
+      max-width: 300px; /* Cap the width on larger mobile devices/tablets */
+      
+      /* Initially off-screen to the left (closed state) */
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-out; 
+      
+      /* Ensure it's above main content but below the hamburger button */
+      @apply z-50 shadow-xl; 
+  }
+  
+  /* 4. OPEN STATE (The class applied via React state) */
+  /* We use the base class here since you removed sidebar-open from the component */
+  .sidebar.sidebar-open {
+      transform: translateX(0); /* Slide into view */
+  }
+
+  /* 5. MAIN CONTENT ADJUSTMENT */
+  .main-content {
+      /* On mobile, the main content should take full width and not be indented */
+      @apply ml-0;
+  }
+  
+  /* 6. OPTIONAL: BACKDROP OVERLAY */
+  .sidebar-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      /* Use Tailwind classes for color */
+      @apply bg-black opacity-50 z-40; 
+  }
+}
+
+/* ======================================================== */
+/* REMAINING COMPONENTS (Unchanged) */
+/* ======================================================== */
+
 
 .page-header {
   @apply mb-12;
