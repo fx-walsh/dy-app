@@ -67,6 +67,7 @@ function ColumnDetail({ bookData }) {
                   src={images[currentPage]}
                   alt={`${column.column_title} - Page ${currentPage + 1}`}
                   className="max-h-[80vh] object-contain"
+                  loading="lazy"
                 />
               </TransformComponent>
             </TransformWrapper>

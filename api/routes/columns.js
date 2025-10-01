@@ -71,28 +71,35 @@ columnsRouter.get("/", async (c) => {
     // The res variable now holds the array of results
     
     let cleanRes = res.map((item) => { // NOTE: map is now synchronous!
-    const filename = item.first_img_file_name;
-    
-      // ⚠️ IMPORTANT: Replace this placeholder with your actual R2 public URL base.
-      // Example: https://pub-xxxxxxxxxxxxxxxx.r2.dev/ or your custom domain
-      const R2_PUBLIC_URL_BASE = c.env.R2_PUBLIC_URL; // Assuming you set this env var
-        console.log(`trying url ${R2_PUBLIC_URL_BASE}!!! abc`)
-        return {
-            ...item, 
-            author: "Frank Walsh", 
-            // 1. Provide the direct public URL for the client to fetch.
-            image_url: `${R2_PUBLIC_URL_BASE}/${filename}`, 
-            
-            // 2. Remove the Base64 fetching logic (r2_obj.arrayBuffer, base64String).
-            // The API response is now tiny and fast!
-            // image_data_base64: null, 
+    const originalFilename = item.first_img_file_name;
+    const parts = originalFilename.split('.');
+    const extension = parts.pop(); // Removes and stores the last part (e.g., "png")
+    const baseName = parts.join('.'); // Joins the rest back (e.g., "book-cover-123")
 
-            publish_date_display: new Date(item.publish_date).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            }),
-        };
+    // 3. Add the suffix and combine them
+    const thumbnailFilename = `${baseName}_thumbnail.${extension}`;
+
+    
+    // ⚠️ IMPORTANT: Replace this placeholder with your actual R2 public URL base.
+    // Example: https://pub-xxxxxxxxxxxxxxxx.r2.dev/ or your custom domain
+    const R2_PUBLIC_URL_BASE = c.env.R2_PUBLIC_URL; // Assuming you set this env var
+      console.log(`trying url ${R2_PUBLIC_URL_BASE}!!! abc`)
+      return {
+          ...item, 
+          author: "Frank Walsh", 
+          // 1. Provide the direct public URL for the client to fetch.
+          image_url: `${R2_PUBLIC_URL_BASE}/${thumbnailFilename}`, 
+          
+          // 2. Remove the Base64 fetching logic (r2_obj.arrayBuffer, base64String).
+          // The API response is now tiny and fast!
+          // image_data_base64: null, 
+
+          publish_date_display: new Date(item.publish_date).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+          }),
+      };
     });
 
     console.log(JSON.stringify(cleanRes));

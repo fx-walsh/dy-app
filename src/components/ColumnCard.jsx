@@ -8,6 +8,7 @@ function ColumnCard({ book, onClick }) {
           src={book.image_url}
           alt={book.column_title}
           className="w-full h-full object-contain transition-transform hover:scale-[1.03] duration-300"
+          loading="lazy"
         />
       </div>
       <div className="book-card-content">
