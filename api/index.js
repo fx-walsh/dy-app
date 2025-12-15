@@ -11,6 +11,11 @@
       console.log("pages r2 binding exists");
       console.log(c.env.PAGE_IMAGES_BUCKET)
     }
+
+    if (c.env.PAGE_TXT_FILES) {
+      console.log("pages txt files r2 binding exists");
+      console.log(c.env.PAGE_TXT_FILES)
+    }
     
     // Check if D1 binding is available
     if (c.env.D1_DATABASE) { // <--- Use the D1 binding name from wrangler.jsonc

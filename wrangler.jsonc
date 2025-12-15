@@ -66,7 +66,7 @@
                 },
                 {
                     "binding": "PAGE_TXT_FILES",
-                    "bucket_name": "dy-page-txt-files-dev"
+                    "bucket_name": "dy-page-txt-files"
                 }
             ],
             "vars": {
