@@ -1,12 +1,77 @@
 import { Hono } from "hono";
 import { selectDataSource, columnsMockUtils } from "../lib/utils.js";
 
+
+/**
+ * Reads the text content of a single object from the PAGE_TXT_FILES R2 bucket.
+ * @param {string} objectPath The key/path of the object in the R2 bucket (e.g., '20040305_p1.txt').
+ * @param {object} env The environment object passed to the Worker, containing R2 bindings.
+ * @returns {Promise<string|null>} The text content of the object, or null if the object is not found.
+ */
+async function getR2TextFileContent(objectPath, env) {
+  // The binding name is 'PAGE_TXT_FILES' as defined in your wrangler.jsonc
+  const bucket = env.PAGE_TXT_FILES;
+
+  if (!bucket) {
+    console.error("R2 binding PAGE_TXT_FILES not found in environment.");
+    return null;
+  }
+
+  try {
+    const object = await bucket.get(objectPath);
+
+    if (object === null) {
+      console.warn(`R2 object not found at path: ${objectPath}`);
+      return null;
+    }
+
+    // Read the object content as text
+    const textContent = await object.text();
+    return textContent;
+
+  } catch (error) {
+    console.error(`Error reading R2 object at path ${objectPath}:`, error);
+    return null;
+  }
+}
+
+
+/**
+ * Fetches and combines the text content of multiple R2 files based on D1 results.
+ * * @param {Array<object>} columnsD1Results The array of rows returned from the D1 query.
+ * @param {object} env The environment object containing R2 bindings.
+ * @returns {Promise<string>} A single string containing all combined file content, separated by two newlines.
+ */
+async function combineR2TextFiles(columnsD1Results, env) {
+    // 1. Get the list of unique R2 text file paths
+    // We filter out nulls/duplicates and map to an array of just the file names.
+    const txtFileNames = columnsD1Results
+      .map(row => row.txt_file_name)
+      .filter((name, index, self) => name && self.indexOf(name) === index); // Filter unique, truthy file names
+
+    // 2. Create an array of Promises to fetch all text files concurrently
+    const fileContentPromises = txtFileNames.map(fileName => 
+      getR2TextFileContent(fileName, env)
+    );
+
+    // 3. Wait for all files to be fetched simultaneously
+    const allFileContents = await Promise.all(fileContentPromises);
+
+    // 4. Combine the results, filtering out nulls (files not found) and joining with the separator
+    const combinedTextContent = allFileContents
+      .filter(content => content !== null) // Ignore files that failed to load (returned null)
+      .join('\n\n'); // Separated by two new lines
+
+    return combinedTextContent;
+}
+
+
+
 // Create columns router
 const columnsRouter = new Hono();
 
 // Column list endpoint with filtering and sorting
 columnsRouter.get("/", async (c) => {
-  console.log("hitting columns endpoints")
   const { genre, sort } = c.req.query();
 
   // Use imported mock logic
@@ -79,21 +144,13 @@ columnsRouter.get("/", async (c) => {
     // 3. Add the suffix and combine them
     const thumbnailFilename = `${baseName}_thumbnail.${extension}`;
 
-    
-    // ⚠️ IMPORTANT: Replace this placeholder with your actual R2 public URL base.
-    // Example: https://pub-xxxxxxxxxxxxxxxx.r2.dev/ or your custom domain
+  
     const R2_PUBLIC_URL_BASE = c.env.R2_PUBLIC_URL; // Assuming you set this env var
-      console.log(`trying url ${R2_PUBLIC_URL_BASE}!!! abc`)
       return {
           ...item, 
           author: "Frank Walsh", 
-          // 1. Provide the direct public URL for the client to fetch.
+          // Provide the direct public URL for the client to fetch.
           image_url: `${R2_PUBLIC_URL_BASE}/${thumbnailFilename}`, 
-          
-          // 2. Remove the Base64 fetching logic (r2_obj.arrayBuffer, base64String).
-          // The API response is now tiny and fast!
-          // image_data_base64: null, 
-
           publish_date_display: new Date(item.publish_date).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
@@ -101,8 +158,6 @@ columnsRouter.get("/", async (c) => {
           }),
       };
     });
-
-    console.log(JSON.stringify(cleanRes));
 
     // The result is already 'cleanRes', no need for Promise.all, as map is synchronous.
     return Response.json({
@@ -135,11 +190,15 @@ columnsRouter.get("/:id", async (c) => {
           cmd.column_title, 
           cmd.first_img_file_name,
           pi.img_file_name AS page_img_file_name, 
-          cmd.publish_date 
+          cmd.publish_date,
+          pt.txt_file_name
       FROM columns_meta_data AS cmd
       INNER JOIN page_images AS pi
         ON
           cmd.column_id = pi.column_id
+      LEFT JOIN page_txt_files as pt
+        ON
+          cmd.column_id = pt.column_id
       WHERE 
           cmd.column_id = ?
       ORDER BY cmd.column_id, pi.page_type
@@ -157,6 +216,7 @@ columnsRouter.get("/:id", async (c) => {
     }
 
     const R2_PUBLIC_URL_BASE = c.env.R2_PUBLIC_URL;
+    const combinedTextContent = await combineR2TextFiles(columns, c.env);
     
     let cleanColumns = columns.map((res) => ({
       ...res, 
@@ -165,14 +225,16 @@ columnsRouter.get("/:id", async (c) => {
       publish_date_display: new Date(res.publish_date).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
       }),
     }))
 
+    console.log("returning column details respsone");
     return Response.json({
       ...cleanColumns[0],
       image_urls: cleanColumns.map((res) => (res.image_url)),
       source: "database",
+      text_content: combinedTextContent, 
     });
   };
 

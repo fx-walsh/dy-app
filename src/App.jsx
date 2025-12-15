@@ -10,7 +10,7 @@ import MockDataBanner from "./components/MockDataBanner";
 function App() {
   const navigate = useNavigate();
   const params = useParams();
-  const [bookDetail, setColumnDetail] = useState(null);
+  const [columnDetail, setColumnDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [genres, setGenres] = useState([]);
   const [dataSource, setDataSource] = useState(null);
@@ -134,8 +134,8 @@ function App() {
             <div className="flex justify-center items-center py-20">
               <div className="h-10 w-10 border-2 border-blue-800 border-t-transparent rounded-full animate-spin"></div>
             </div>
-          ) : bookDetail ? (
-            <ColumnDetail bookData={bookDetail} />
+          ) : columnDetail ? (
+            <ColumnDetail columnData={columnDetail} />
           ) : (
             <div className="text-center py-20 text-gray-600">
               Error loading book details

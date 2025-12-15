@@ -36,7 +36,6 @@
   app.get("/images/:filename", async (c) => {
       const filename = c.req.param('filename');
       const r2_obj = await c.env.PAGE_IMAGES_BUCKET.get(filename);
-      console.log("loading an image!!");
       if (r2_obj === null) {
           return c.notFound();
       }
