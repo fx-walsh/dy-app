@@ -349,11 +349,6 @@ p {
   @apply border-b-0;
 }
 
-/* Mock Data Banner Styling */
-.mock-data-banner {
-  @apply bg-blue-50 border border-blue-300 rounded-lg my-4 p-4 relative;
-}
-
 .banner-content {
   @apply text-black;
 }

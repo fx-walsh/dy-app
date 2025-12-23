@@ -159,7 +159,7 @@ function ColumnDetail({ columnData }) {
                 // Assuming column.text_content is a string, perhaps with line breaks
                 // You might need to use a library like 'markdown-to-jsx' or 'dangerouslySetInnerHTML' 
                 // if the text contains complex formatting. For simple line breaks:
-                column.text_content.split('\n').map((line, index) => (
+                column.text_content.split('\n\n').map((line, index) => (
                   <p key={index} className="text-gray-900 leading-relaxed mb-4 whitespace-pre-wrap">
                     {line}
                   </p>

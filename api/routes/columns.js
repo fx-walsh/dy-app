@@ -217,6 +217,8 @@ columnsRouter.get("/:id", async (c) => {
 
     const R2_PUBLIC_URL_BASE = c.env.R2_PUBLIC_URL;
     const combinedTextContent = await combineR2TextFiles(columns, c.env);
+
+    console.log(JSON.stringify(columns));
     
     let cleanColumns = columns.map((res) => ({
       ...res, 
@@ -232,7 +234,8 @@ columnsRouter.get("/:id", async (c) => {
     console.log("returning column details respsone");
     return Response.json({
       ...cleanColumns[0],
-      image_urls: cleanColumns.map((res) => (res.image_url)),
+      // want only distinct image urls to dictate images pages
+      image_urls: [...new Set(cleanColumns.map((res) => (res.image_url)))],
       source: "database",
       text_content: combinedTextContent, 
     });

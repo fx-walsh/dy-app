@@ -5,7 +5,6 @@ import Breadcrumbs from "./components/Breadcrumbs";
 import Sidebar from "./components/Sidebar";
 import ColumnsList from "./components/ColumnsList";
 import ColumnDetail from "./components/ColumnDetail";
-import MockDataBanner from "./components/MockDataBanner";
 
 function App() {
   const navigate = useNavigate();
@@ -125,8 +124,6 @@ function App() {
 
         <div className="page-header">
           <h1>{activeGenre ? `${activeGenre} Columns` : "Damn Yankee Columns"}</h1>
-          {/* Show banner only when using mock data */}
-          {dataSource === "mock" && <MockDataBanner />}
         </div>
 
         {bookId ? (
